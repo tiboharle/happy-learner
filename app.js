@@ -4,7 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var sassMiddleware = require('node-sass-middleware');
-
+var mongoose = require('mongoose');
 var indexRouter = require('./routes/index');
 
 var app = express();
@@ -26,7 +26,11 @@ app.use(sassMiddleware({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+mongoose.connect('mongodb+srv://jimbob:<dYEBN5QWuJ8Ws2OL>@cluster0-pme76.mongodb.net/test?retryWrites=true&w=majority',
+  { useNewUrlParser: true,
+    useUnifiedTopology: true })
+  .then(() => console.log('Connexion à MongoDB réussie !'))
+  .catch(() => console.log('Connexion à MongoDB échouée !'));
 
 
 // ROUTES
