@@ -1,12 +1,15 @@
 var createError = require('http-errors');
 var express = require('express');
+var nodemailer = require('nodemailer');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var sassMiddleware = require('node-sass-middleware');
 var mongoose = require('mongoose');
 var indexRouter = require('./routes/index');
-
+var homeRouter = require('./routes/home');
+var achatRouter = require('./routes/achat');
+require('dotenv').config({ path: '.env' });
 var app = express();
 
 
@@ -26,7 +29,7 @@ app.use(sassMiddleware({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-mongoose.connect('mongodb+srv://jimbob:<dYEBN5QWuJ8Ws2OL>@cluster0-pme76.mongodb.net/test?retryWrites=true&w=majority',
+mongoose.connect(process.env.DATABASE,
   { useNewUrlParser: true,
     useUnifiedTopology: true })
   .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -36,8 +39,9 @@ mongoose.connect('mongodb+srv://jimbob:<dYEBN5QWuJ8Ws2OL>@cluster0-pme76.mongodb
 // ROUTES
 app.use('/', indexRouter);
 
+app.use('/', homeRouter);
 
-
+app.use('/achat', achatRouter);
 
 // GESTION CAS PARITCULIERS
 // catch 404 and forward to error handler
@@ -57,5 +61,33 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+'use strict';
+
+const transporter = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    auth: {
+        user: 'thibaut.devreact@gmail.com',
+        pass: 'rzfejHvUy4EHnt115W'
+    }
+});
+/* Le contenu du votre mail */
+let mailOptions = {
+    from: '"Harle Thibaut " <'thibaut.devreact@gmail.com'>,
+    to: 'fredde.lgrd@email.com,
+    subject: 'CA MARCHE !',
+    text: 'Envoie du message de test',
+    html: "<b>Bonjour </b>"
+};
+/* envoie du mail */
+transporter.sendMail(mailOptions, (error, info) => {
+    if (error) {
+        return console.log(error);
+    }
+    console.log('Message %s envoyé: %s', info.messageId, info.response);
+});
+
 
 module.exports = app;
